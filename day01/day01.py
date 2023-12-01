@@ -21,15 +21,16 @@ def parse1(line: str) -> int:
     >>> parse1("a1b9c")
     19
     """
-    m1 = re.search(r"(\d)", line)
-    if not m1:
+    m = re.search(r"(\d)", line)
+    if not m:
         raise ValueError(line)
+    x = m.group(1)
 
-    m2 = re.search(r"(\d)[^\d]*$", line)
-    if not m2:
+    m = re.search(r"(\d)[^\d]*$", line)
+    if not m:
         raise ValueError(line)
+    y = m.group(1)
 
-    x, y = m1.group(1), m2.group(1)
     return int(f"{x}{y}")
 
 
@@ -44,7 +45,7 @@ def parse2(line: str) -> int:
     >>> parse2("sevenine")
     79
     """
-    repls = {
+    words = {
         "one": "1",
         "two": "2",
         "three": "3",
@@ -55,17 +56,21 @@ def parse2(line: str) -> int:
         "eight": "8",
         "nine": "9",
     }
-    search = re.compile(r"(\d|" + "|".join(repls) + ")").search
-    digits = []
-    # This is complicated by allowing for overlapping words so we apply
-    # the pattern repeatedly from first to last character of the line rather
-    # than trying to be clever with the pattern. It performs well enough to solve
-    # the puzzle.
-    for i in range(len(line)):
+    search = re.compile(r"(\d|" + "|".join(words) + ")").search
+    m = search(line)
+    if not m:
+        raise ValueError(line)
+    x = words.get(m.group(1), m.group(1))
+
+    # scan line from end till we match
+    for i in range(len(line) - 1, -1, -1):
         if m := search(line[i:]):
-            digits.append(repls.get(m.group(1), m.group(1)))
-    a, b = digits[0], digits[-1]
-    return int(f"{a}{b}")
+            break
+    else:
+        raise ValueError(line)
+    y = words.get(m.group(1), m.group(1))
+
+    return int(f"{x}{y}")
 
 
 def part1(lines) -> int:
