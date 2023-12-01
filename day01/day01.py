@@ -86,6 +86,9 @@ def test():
     assert parse2("sevenine") == 79
     assert part1(SAMPLE1.splitlines()) == 142
     assert part2(SAMPLE2.splitlines()) == 281
+    lines = INPUT.splitlines()
+    assert part1(lines) == 55477
+    assert part2(lines) == 54431
 
 
 def main():
