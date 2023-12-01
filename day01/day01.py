@@ -16,10 +16,10 @@ def parse1(line: str) -> int:
     Parse line, returning the first and last digit as a two-digit number number.
 
     >>> parse1("abc1def")
-    >>> 11
+    11
 
     >>> parse1("a1b9c")
-    >>> 19
+    19
     """
     m1 = re.search(r"(\d)", line)
     if not m1:
@@ -39,10 +39,10 @@ def parse2(line: str) -> int:
     The digits may also be spelled out as words and the words may overlap.
 
     >>> parse2("eighthree")
-    >>> 83
+    83
 
     >>> parse2("sevenine")
-    >>> 79
+    79
     """
     repls = {
         "one": "1",

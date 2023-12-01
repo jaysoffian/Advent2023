@@ -23,5 +23,6 @@ repos:
         entry: pytest
         language: system
         files: '^day\d+/[^/]+\.py$'
+        args: [ --doctest-modules ]
         verbose: true
 fail_fast: true
