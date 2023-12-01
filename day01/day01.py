@@ -45,6 +45,10 @@ def parse2(line: str) -> int:
     >>> parse2("sevenine")
     79
     """
+
+    def rs(s: str) -> str:
+        return "".join(reversed(s))
+
     words = {
         "one": "1",
         "two": "2",
@@ -56,19 +60,17 @@ def parse2(line: str) -> int:
         "eight": "8",
         "nine": "9",
     }
-    search = re.compile(r"(\d|" + "|".join(words) + ")").search
-    m = search(line)
+    search_forward = re.compile(r"(\d|" + "|".join(words) + ")").search
+    m = search_forward(line)
     if not m:
         raise ValueError(line)
     x = words.get(m.group(1), m.group(1))
 
-    # scan line from end till we match
-    for i in range(len(line) - 1, -1, -1):
-        if m := search(line[i:]):
-            break
-    else:
+    search_reversed = re.compile(r"(\d|" + "|".join(rs(w) for w in words) + ")").search
+    m = search_reversed(rs(line))
+    if not m:
         raise ValueError(line)
-    y = words.get(m.group(1), m.group(1))
+    y = words.get(rs(m.group(1)), m.group(1))
 
     return int(f"{x}{y}")
 
