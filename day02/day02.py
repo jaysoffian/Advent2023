@@ -73,14 +73,14 @@ def parse_game2(line: str) -> int:
     """
     game_number, grabs = split_line(line)
 
-    min_r, min_g, min_b = 0, 0, 0
+    max_r, max_g, max_b = 0, 0, 0
     for grab in grabs.split("; "):
         r, g, b = parse_grab(grab)
-        min_r = max(min_r, r)
-        min_g = max(min_g, g)
-        min_b = max(min_b, b)
+        max_r = max(max_r, r)
+        max_g = max(max_g, g)
+        max_b = max(max_b, b)
 
-    return min_r * min_g * min_b
+    return max_r * max_g * max_b
 
 
 def part1(lines) -> int:
