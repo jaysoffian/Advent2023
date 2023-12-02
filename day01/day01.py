@@ -46,9 +46,6 @@ def parse2(line: str) -> int:
     79
     """
 
-    def rs(s: str) -> str:
-        return "".join(reversed(s))
-
     words = {
         "one": "1",
         "two": "2",
@@ -60,17 +57,19 @@ def parse2(line: str) -> int:
         "eight": "8",
         "nine": "9",
     }
-    search_forward = re.compile(r"(\d|" + "|".join(words) + ")").search
-    m = search_forward(line)
-    if not m:
-        raise ValueError(line)
+    pattern = r"(\d|" + "|".join(words) + ")"
+    m = re.search(pattern, line)
+    assert m, line
     x = words.get(m.group(1), m.group(1))
 
-    search_reversed = re.compile(r"(\d|" + "|".join(rs(w) for w in words) + ")").search
-    m = search_reversed(rs(line))
-    if not m:
-        raise ValueError(line)
-    y = words.get(rs(m.group(1)), m.group(1))
+    # To allow for overlapping words, we search from the end by reversing each word
+    # and the string being searched and then searching from the front. Alternately,
+    # we could use a more-complicated lookahead-assertion or we could apply the
+    # forward pattern repeateadly while walking backwards through the string.
+    pattern = r"(\d|" + "|".join(w[::-1] for w in words) + ")"
+    m = re.search(pattern, line[::-1])
+    assert m, line
+    y = words.get(m.group(1)[::-1], m.group(1))
 
     return int(f"{x}{y}")
 
@@ -83,7 +82,7 @@ def part2(lines) -> int:
     return sum(parse2(line) for line in lines)
 
 
-def test():
+def test() -> None:
     assert parse2("eighthree") == 83
     assert parse2("sevenine") == 79
     assert part1(SAMPLE1.splitlines()) == 142
@@ -93,7 +92,7 @@ def test():
     assert part2(lines) == 54431
 
 
-def main():
+def main() -> None:
     lines = INPUT.splitlines()
     print(part1(lines))
     print(part2(lines))
