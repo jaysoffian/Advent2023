@@ -7,29 +7,50 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SAMPLE1 = (HERE / "sample1.txt").read_text()
-SAMPLE2 = (HERE / "sample2.txt").read_text()
+SAMPLE = (HERE / "sample.txt").read_text()
 INPUT = (HERE / "input.txt").read_text()
 
 
-def parse_game1(game: str) -> int:
-    def valid_grab(grab: str) -> bool:
-        counts: Counter[str] = Counter()
-        for count_color in grab.split(", "):
-            count, color = count_color.split()
-            counts[color] = int(count)
-        r, g, b = counts["red"], counts["green"], counts["blue"]
-        return r <= 12 and g <= 13 and b <= 14
-
-    m = re.search(r"^Game (\d+): (.*)", game)
+def split_line(line: str) -> tuple[int, str]:
+    m = re.search(r"^Game (\d+): (.*)", line)
     assert m is not None
     game_number, grabs = m.groups()
+    return int(game_number), grabs
+
+
+def parse_grab(grab: str) -> tuple[int, int, int]:
+    counts: Counter[str] = Counter()
+    for count_color in grab.split(", "):
+        count, color = count_color.split()
+        counts[color] = int(count)
+    return counts["red"], counts["green"], counts["blue"]
+
+
+def parse_game1(line: str) -> int:
+    game_number, grabs = split_line(line)
+
+    def is_valid_grab(grab: str) -> bool:
+        r, g, b = parse_grab(grab)
+        return r <= 12 and g <= 13 and b <= 14
 
     for grab in grabs.split("; "):
-        if not valid_grab(grab):
+        if not is_valid_grab(grab):
             return 0
 
-    return int(game_number)
+    return game_number
+
+
+def parse_game2(line: str) -> int:
+    game_number, grabs = split_line(line)
+
+    min_r, min_g, min_b = 0, 0, 0
+    for grab in grabs.split("; "):
+        r, g, b = parse_grab(grab)
+        min_r = max(min_r, r)
+        min_g = max(min_g, g)
+        min_b = max(min_b, b)
+
+    return min_r * min_g * min_b
 
 
 def part1(lines) -> int:
@@ -37,13 +58,15 @@ def part1(lines) -> int:
 
 
 def part2(lines) -> int:
-    return 0
+    return sum(parse_game2(line) for line in lines)
 
 
 def test():
-    assert part1(SAMPLE1.splitlines()) == 8
     lines = INPUT.splitlines()
+    assert part1(SAMPLE.splitlines()) == 8
     assert part1(lines) == 2164
+    assert part2(SAMPLE.splitlines()) == 2286
+    assert part2(lines) == 69929
 
 
 def main():
