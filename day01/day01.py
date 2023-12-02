@@ -22,13 +22,13 @@ def parse1(line: str) -> int:
     19
     """
     m = re.search(r"(\d)", line)
-    if not m:
-        raise ValueError(line)
+    assert m, line
     x = m.group(1)
 
-    m = re.search(r"(\d)[^\d]*$", line)
-    if not m:
-        raise ValueError(line)
+    # prefixing the pattern with .* consumes the entire string and then backtracks
+    # till it finds a match, returning the final matching digit.
+    m = re.search(r".*(\d)", line)
+    assert m, line
     y = m.group(1)
 
     return int(f"{x}{y}")
@@ -62,14 +62,11 @@ def parse2(line: str) -> int:
     assert m, line
     x = words.get(m.group(1), m.group(1))
 
-    # To allow for overlapping words, we search from the end by reversing each word
-    # and the string being searched and then searching from the front. Alternately,
-    # we could use a more-complicated lookahead-assertion or we could apply the
-    # forward pattern repeateadly while walking backwards through the string.
-    pattern = r"(\d|" + "|".join(w[::-1] for w in words) + ")"
-    m = re.search(pattern, line[::-1])
+    # prefixing the pattern with .* consumes the entire string and then backtracks
+    # till it finds a match, returning the final matching digit (or word).
+    m = re.search(f".*{pattern}", line)
     assert m, line
-    y = words.get(m.group(1)[::-1], m.group(1))
+    y = words.get(m.group(1), m.group(1))
 
     return int(f"{x}{y}")
 
