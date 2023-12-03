@@ -7,7 +7,7 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SAMPLE = (HERE / "sample.txt").read_text()
+SAMPLE = (HERE / "example.txt").read_text()
 INPUT = (HERE / "input.txt").read_text()
 
 
