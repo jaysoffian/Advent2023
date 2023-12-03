@@ -2,8 +2,9 @@
 """
 https://adventofcode.com/2023/day/3
 """
+import itertools
 import re
-from collections import namedtuple
+from dataclasses import dataclass
 from operator import mul
 from pathlib import Path
 from typing import Iterator
@@ -12,59 +13,87 @@ HERE = Path(__file__).parent
 SAMPLE = (HERE / "sample.txt").read_text()
 INPUT = (HERE / "input.txt").read_text()
 
-Coord = namedtuple("Coord", "x y")
-Span = namedtuple("Span", "start end")  # end is 1 past the end
+# [(-1-1j), (-1+0j), (-1+1j), -1j, 1j, (1-1j), (1+0j), (1+1j)]
+BORDER = list(
+    complex(x, y)
+    for x, y in itertools.product(range(-1, 2), range(-1, 2))
+    if (x, y) != (0, 0)
+)
 
 
-class Part(namedtuple("Part", "number span y")):
-    def border(self) -> Iterator[Coord]:
-        for y in (self.y - 1, self.y + 1):
-            for x in range(self.span.start - 1, self.span.end + 1):
-                yield Coord(x, y)
-        for x in (self.span.start - 1, self.span.end):
-            yield Coord(x, self.y)
+@dataclass(frozen=True)
+class Part:
+    "Part number and position"
 
-    def hit(self, coords: set[Coord]) -> bool:
-        return bool(set(self.border()) & coords)
+    num: int
+    pos: complex
+
+
+@dataclass(frozen=True)
+class Symbol:
+    "Symbol and position"
+
+    char: str
+    pos: complex
+
+    @property
+    def border(self) -> Iterator[complex]:
+        "Iterator over symbol border coordinates"
+        for offset in BORDER:
+            yield self.pos + offset
+
+    @property
+    def is_gear(self) -> bool:
+        return self.char == "*"
+
+    def intersect(self, coords: set[complex]) -> set[complex]:
+        "Return intersection of coordinates with symbol's border"
+        return set(self.border) & coords
 
 
 class Graph:
-    def __init__(self):
-        self.parts: list[Part] = []
-        self.symbols: set[Coord] = set()
-        self.gears: set[Coord] = set()
+    def __init__(self) -> None:
+        self.parts: dict[complex, Part] = {}
+        self.symbols: list[Symbol] = []
 
     @classmethod
     def parse(cls, lines) -> "Graph":
-        inst = cls()
+        "Return Graph from lines"
+        graph = cls()
         for y, line in enumerate(lines):
+            # index parts by their span
             for m in re.finditer(r"\d+", line):
-                inst.parts.append(Part(int(m.group()), Span(*m.span()), y))
+                part = Part(int(m.group()), complex(m.start(), y))
+                for x in range(*m.span()):
+                    graph.parts[complex(x, y)] = part
+            # symbols
             for m in re.finditer(r"[^\d.]", line):
-                inst.symbols.add(Coord(m.start(), y))
-            for m in re.finditer(r"\*", line):
-                inst.gears.add(Coord(m.start(), y))
-        return inst
+                pos = complex(m.start(), y)
+                sym = Symbol(m.group(), pos)
+                graph.symbols.append(sym)
+
+        return graph
+
+    def nearby_parts(self, symbol) -> list[Part]:
+        "Return list of parts that intersect with symbol's border"
+        parts = set()
+        for pos in symbol.intersect(set(self.parts)):
+            parts.add(self.parts[pos])
+        return list(parts)
 
 
 def part1(graph: Graph) -> int:
     total = 0
-    for part in graph.parts:
-        if part.hit(graph.symbols):
-            total += part.number
+    for sym in graph.symbols:
+        total += sum(p.num for p in graph.nearby_parts(sym))
     return total
 
 
 def part2(graph: Graph) -> int:
     total = 0
-    for gear in graph.gears:
-        nearby_parts = [
-            p for p in graph.parts if p.y in {gear.y - 1, gear.y, gear.y + 1}
-        ]
-        part_numbers: list[int] = []
-        for part in nearby_parts:
-            if part.hit({gear}):
-                part_numbers.append(part.number)
+    gears = (sym for sym in graph.symbols if sym.is_gear)
+    for gear in gears:
+        part_numbers = [p.num for p in graph.nearby_parts(gear)]
         if len(part_numbers) == 2:
             total += mul(*part_numbers)
     return total
