@@ -25,10 +25,7 @@ class Part(namedtuple("Part", "number span y")):
             yield Coord(x, self.y)
 
     def hit(self, coords: set[Coord]) -> bool:
-        for coord in self.border():
-            if coord in coords:
-                return True
-        return False
+        return bool(set(self.border()) & coords)
 
 
 class Graph:
