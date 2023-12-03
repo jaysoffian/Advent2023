@@ -8,4 +8,7 @@ export PIP_DISABLE_PIP_VERSION_CHECK=1
 day%: FORCE
 	bin/download "$@"
 
+test:
+	pytest -v --doctest-modules day*/day*.py
+
 FORCE:
