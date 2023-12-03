@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Iterator
 
 HERE = Path(__file__).parent
-SAMPLE = (HERE / "sample.txt").read_text()
-INPUT = (HERE / "input.txt").read_text()
+SAMPLE = (HERE / "sample.txt").read_text().splitlines()
+INPUT = (HERE / "input.txt").read_text().splitlines()
 
 # [(-1-1j), (-1+0j), (-1+1j), -1j, 1j, (1-1j), (1+0j), (1+1j)]
 BORDER = list(
@@ -103,18 +103,20 @@ def part2(graph: Graph) -> int:
     return total
 
 
-def test() -> None:
-    graph = Graph.parse(SAMPLE.splitlines())
+def test_sample() -> None:
+    graph = Graph.parse(SAMPLE)
     assert part1(graph) == 4361
     assert part2(graph) == 467835
 
-    graph = Graph.parse(INPUT.splitlines())
+
+def test_input() -> None:
+    graph = Graph.parse(INPUT)
     assert part1(graph) == 521515
     assert part2(graph) == 69527306
 
 
 def main() -> None:
-    graph = Graph.parse(INPUT.splitlines())
+    graph = Graph.parse(INPUT)
     print(part1(graph))
     print(part2(graph))
 
