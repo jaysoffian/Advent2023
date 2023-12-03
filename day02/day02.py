@@ -7,8 +7,8 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SAMPLE = (HERE / "example.txt").read_text()
-INPUT = (HERE / "input.txt").read_text()
+SAMPLE = (HERE / "example.txt").read_text().splitlines()
+INPUT = (HERE / "input.txt").read_text().splitlines()
 
 
 def parse_grab(grab: str) -> tuple[int, int, int]:
@@ -88,15 +88,15 @@ def part2(lines: list[str]) -> int:
 
 
 def test() -> None:
-    lines = INPUT.splitlines()
-    assert part1(SAMPLE.splitlines()) == 8
+    lines = INPUT
+    assert part1(SAMPLE) == 8
     assert part1(lines) == 2164
-    assert part2(SAMPLE.splitlines()) == 2286
+    assert part2(SAMPLE) == 2286
     assert part2(lines) == 69929
 
 
 def main() -> None:
-    lines = INPUT.splitlines()
+    lines = INPUT
     print(part1(lines))
     print(part2(lines))
 

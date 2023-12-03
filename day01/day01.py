@@ -6,9 +6,9 @@ import re
 from pathlib import Path
 
 HERE = Path(__file__).parent
-EXAMPLE1 = (HERE / "example1.txt").read_text()
-EXAMPLE2 = (HERE / "example2.txt").read_text()
-INPUT = (HERE / "input.txt").read_text()
+EXAMPLE1 = (HERE / "example1.txt").read_text().splitlines()
+EXAMPLE2 = (HERE / "example2.txt").read_text().splitlines()
+INPUT = (HERE / "input.txt").read_text().splitlines()
 
 
 def parse1(line: str) -> int:
@@ -82,15 +82,15 @@ def part2(lines) -> int:
 def test() -> None:
     assert parse2("eighthree") == 83
     assert parse2("sevenine") == 79
-    assert part1(EXAMPLE1.splitlines()) == 142
-    assert part2(EXAMPLE2.splitlines()) == 281
-    lines = INPUT.splitlines()
+    assert part1(EXAMPLE1) == 142
+    assert part2(EXAMPLE2) == 281
+    lines = INPUT
     assert part1(lines) == 55477
     assert part2(lines) == 54431
 
 
 def main() -> None:
-    lines = INPUT.splitlines()
+    lines = INPUT
     print(part1(lines))
     print(part2(lines))
 
