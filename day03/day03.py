@@ -25,16 +25,16 @@ BORDER = list(
 class Part:
     "Part number and position"
 
-    num: int
     pos: complex
+    num: int
 
 
 @dataclass(frozen=True)
 class Symbol:
     "Symbol and position"
 
-    char: str
     pos: complex
+    char: str
 
     @property
     def border(self) -> Iterator[complex]:
@@ -63,16 +63,21 @@ class Graph:
         for y, line in enumerate(lines):
             # index parts by their span
             for m in re.finditer(r"\d+", line):
-                part = Part(int(m.group()), complex(m.start(), y))
+                pos = complex(m.start(), y)
+                part = Part(pos, int(m.group()))
                 for x in range(*m.span()):
                     graph.parts[complex(x, y)] = part
             # symbols
             for m in re.finditer(r"[^\d.]", line):
                 pos = complex(m.start(), y)
-                sym = Symbol(m.group(), pos)
+                sym = Symbol(pos, m.group())
                 graph.symbols.append(sym)
 
         return graph
+
+    @property
+    def gears(self) -> list[Symbol]:
+        return [sym for sym in self.symbols if sym.is_gear]
 
     def nearby_parts(self, symbol) -> list[Part]:
         "Return list of parts that intersect with symbol's border"
@@ -91,11 +96,10 @@ def part1(graph: Graph) -> int:
 
 def part2(graph: Graph) -> int:
     total = 0
-    gears = (sym for sym in graph.symbols if sym.is_gear)
-    for gear in gears:
-        part_numbers = [p.num for p in graph.nearby_parts(gear)]
-        if len(part_numbers) == 2:
-            total += mul(*part_numbers)
+    for gear in graph.gears:
+        part_nums = [p.num for p in graph.nearby_parts(gear)]
+        if len(part_nums) == 2:
+            total += mul(*part_nums)
     return total
 
 
