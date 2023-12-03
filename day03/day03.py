@@ -79,7 +79,7 @@ class Graph:
     def gears(self) -> list[Symbol]:
         return [sym for sym in self.symbols if sym.is_gear]
 
-    def nearby_parts(self, symbol) -> list[Part]:
+    def adjacent_parts(self, symbol) -> list[Part]:
         "Return list of parts that intersect with symbol's border"
         parts = set()
         for pos in symbol.intersect(set(self.parts)):
@@ -90,14 +90,14 @@ class Graph:
 def part1(graph: Graph) -> int:
     total = 0
     for sym in graph.symbols:
-        total += sum(p.num for p in graph.nearby_parts(sym))
+        total += sum(p.num for p in graph.adjacent_parts(sym))
     return total
 
 
 def part2(graph: Graph) -> int:
     total = 0
     for gear in graph.gears:
-        part_nums = [p.num for p in graph.nearby_parts(gear)]
+        part_nums = [p.num for p in graph.adjacent_parts(gear)]
         if len(part_nums) == 2:
             total += mul(*part_nums)
     return total
