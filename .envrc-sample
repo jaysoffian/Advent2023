@@ -1,4 +1,9 @@
 export PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# https://github.com/tobias-walle/advent-of-code-cli
+# export AOC_SESSION=
+# export PATH="$HOME/.cargo/bin:$PATH"
+
 layout python
 if test requirements.txt -nt .direnv/setup.done; then
     make
