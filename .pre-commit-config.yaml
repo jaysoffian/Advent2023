@@ -6,12 +6,21 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+  - repo: https://github.com/maxwinterstein/shfmt-py
+    rev: v3.7.0.1
+    hooks:
+      - id: shfmt
+        args: [ -w, -i, "2", -ci ]
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.6
     hooks:
       - id: ruff-format
       - id: ruff
-        args: [ --fix ]
+        args: [--fix]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.7.1
     hooks:
@@ -23,6 +32,6 @@ repos:
         entry: pytest
         language: system
         files: '^day\d+/[^/]+\.py$'
-        args: [ --doctest-modules ]
+        args: [--doctest-modules]
         verbose: true
 fail_fast: true

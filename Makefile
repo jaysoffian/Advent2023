@@ -4,3 +4,8 @@ export PIP_DISABLE_PIP_VERSION_CHECK=1
 	pip install --upgrade pip
 	pip install -r requirements.txt
 	touch "$@"
+
+day%: FORCE
+	bin/download "$@"
+
+FORCE:

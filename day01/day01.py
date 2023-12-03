@@ -79,20 +79,19 @@ def part2(lines) -> int:
     return sum(parse2(line) for line in lines)
 
 
-def test() -> None:
-    assert parse2("eighthree") == 83
-    assert parse2("sevenine") == 79
+def test_examples() -> None:
     assert part1(EXAMPLE1) == 142
     assert part2(EXAMPLE2) == 281
-    lines = INPUT
-    assert part1(lines) == 55477
-    assert part2(lines) == 54431
+
+
+def test_input() -> None:
+    assert part1(INPUT) == 55477
+    assert part2(INPUT) == 54431
 
 
 def main() -> None:
-    lines = INPUT
-    print(part1(lines))
-    print(part2(lines))
+    print(part1(INPUT))
+    print(part2(INPUT))
 
 
 if __name__ == "__main__":

@@ -7,7 +7,8 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SAMPLE = (HERE / "example.txt").read_text().splitlines()
+EXAMPLE1 = (HERE / "example1.txt").read_text().splitlines()
+EXAMPLE2 = (HERE / "example2.txt").read_text().splitlines()
 INPUT = (HERE / "input.txt").read_text().splitlines()
 
 
@@ -87,12 +88,14 @@ def part2(lines: list[str]) -> int:
     return sum(parse_line_2(line) for line in lines)
 
 
-def test() -> None:
-    lines = INPUT
-    assert part1(SAMPLE) == 8
-    assert part1(lines) == 2164
-    assert part2(SAMPLE) == 2286
-    assert part2(lines) == 69929
+def test_examples() -> None:
+    assert part1(EXAMPLE1) == 8
+    assert part2(EXAMPLE2) == 2286
+
+
+def test_input() -> None:
+    assert part1(INPUT) == 2164
+    assert part2(INPUT) == 69929
 
 
 def main() -> None:
