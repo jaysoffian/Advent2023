@@ -3,6 +3,7 @@
 https://adventofcode.com/2023/day/4
 """
 import re
+from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -25,6 +26,11 @@ def parse_line(line: str) -> tuple[int, set[int], set[int]]:
     return int(card_num), set(map(int, win.split())), set(map(int, have.split()))
 
 
+def num_matches(line: str) -> int:
+    _, win, have = parse_line(line)
+    return len(win & have)
+
+
 def eval1(line: str) -> int:
     """
     Return value of line which is the 2 ** (number of winning cards - 1) or 0
@@ -43,8 +49,7 @@ def eval1(line: str) -> int:
     >>> eval1("Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11")
     0
     """
-    _, win, have = parse_line(line)
-    num_win = len(win & have)
+    num_win = num_matches(line)
     return 2 ** (num_win - 1) if num_win else 0
 
 
@@ -53,17 +58,28 @@ def part1(lines: list[str]) -> int:
 
 
 def part2(lines: list[str]) -> int:
-    return 0
+    num_lines = len(lines)
+    copies: Counter[int] = Counter()
+
+    for i in range(1, num_lines + 1):
+        copies[i] += 1
+
+    for i, line in enumerate(lines, 1):
+        num_wins = num_matches(line)
+        for j in range(i + 1, min(i + 1 + num_wins, num_lines + 1)):
+            copies[j] += copies[i]
+
+    return copies.total()
 
 
 def test_examples() -> None:
     assert part1(EXAMPLE1) == 13
-    assert part2(EXAMPLE2) == 0
+    assert part2(EXAMPLE2) == 30
 
 
 def test_input() -> None:
     assert part1(INPUT) == 21088
-    assert part2(INPUT) == 0
+    assert part2(INPUT) == 6874754
 
 
 def main() -> None:
