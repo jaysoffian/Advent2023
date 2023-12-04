@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+"""
+mkday
+~~~~~
+Create and populate dayNN puzzle directory.
+"""
+import sys
+import time
+from datetime import date
+from pathlib import Path
+
+import typer
+from aocd.models import Puzzle
+from typing_extensions import Annotated
+
+BIN_DIR = Path(__file__).parent
+REPO_DIR = BIN_DIR.parent
+README_MD = """\
+# Day {puzzle.day}: {puzzle.title}
+
+{puzzle.url}
+"""
+
+
+def die(message: str) -> None:
+    print(message, file=sys.stderr)
+    raise typer.Exit(1)
+
+
+def today() -> int:
+    return date.today().day
+
+
+def is_unlocked(puzzle: Puzzle) -> bool:
+    return time.time() >= puzzle.unlock_time().timestamp()
+
+
+def main(day: Annotated[int, typer.Argument()] = today()):
+    puzzle = Puzzle(year=2023, day=day)
+    if not is_unlocked(puzzle):
+        die(f"Puzzle day {day} is not yet unlocked.")
+
+    day_dir = REPO_DIR / f"day{day:02}"
+    day_dir.mkdir(exist_ok=True)
+
+    day_py = Path(f"{day_dir}/day{day:02}.py")
+    if not day_py.exists():
+        text = Path(f"{REPO_DIR}/day00/day00.py").read_text()
+        text = text.replace("day/0", f"day/{day}")
+        text = text.replace("day=1", f"day={day}")
+        day_py.write_text(text)
+        day_py.chmod(0o755)
+
+    readme_md = day_dir / "README.md"
+    if not readme_md.exists():
+        readme_md.write_text(README_MD.format(puzzle=puzzle))
+
+    for i, example in enumerate(puzzle.examples, 1):
+        example_txt = day_dir / f"example{i}.txt"
+        if not example_txt.exists():
+            example_txt.write_text(example.input_data + "\n")
+
+    example2_txt = day_dir / "example2.txt"
+    if not example2_txt.exists():
+        example2_txt.symlink_to("example1.txt")
+
+
+if __name__ == "__main__":
+    typer.run(main)

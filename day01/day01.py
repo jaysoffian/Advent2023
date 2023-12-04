@@ -5,10 +5,12 @@ https://adventofcode.com/2023/day/1
 import re
 from pathlib import Path
 
+from aocd import data
+
 HERE = Path(__file__).parent
 EXAMPLE1 = (HERE / "example1.txt").read_text().splitlines()
 EXAMPLE2 = (HERE / "example2.txt").read_text().splitlines()
-INPUT = (HERE / "input.txt").read_text().splitlines()
+INPUT = data.splitlines()
 
 
 def parse1(line: str) -> int:

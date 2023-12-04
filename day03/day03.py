@@ -9,10 +9,12 @@ from operator import mul
 from pathlib import Path
 from typing import Iterator
 
+from aocd import get_data
+
 HERE = Path(__file__).parent
 EXAMPLE1 = (HERE / "example1.txt").read_text().splitlines()
 EXAMPLE2 = (HERE / "example2.txt").read_text().splitlines()
-INPUT = (HERE / "input.txt").read_text().splitlines()
+INPUT = get_data(year=2023, day=3).splitlines()
 
 # [(-1-1j), (-1+0j), (-1+1j), -1j, 1j, (1-1j), (1+0j), (1+1j)]
 BORDER = list(

@@ -6,10 +6,12 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from aocd import get_data
+
 HERE = Path(__file__).parent
 EXAMPLE1 = (HERE / "example1.txt").read_text().splitlines()
 EXAMPLE2 = (HERE / "example2.txt").read_text().splitlines()
-INPUT = (HERE / "input.txt").read_text().splitlines()
+INPUT = get_data(year=2023, day=2).splitlines()
 
 
 def parse_grab(grab: str) -> tuple[int, int, int]:

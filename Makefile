@@ -11,7 +11,7 @@ venv: .direnv/setup.done
 FORCE:
 
 day%: FORCE
-	bin/download $@
+	bin/mkday $(@:day%=%)
 
 test%: FORCE
 	pytest -v --doctest-modules $(@:test%=day%)/day*.py

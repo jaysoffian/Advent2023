@@ -1,67 +1,65 @@
-#!/bin/bash
+#!/usr/bin/env python3
+"""
+submit
+~~~~~
+Submit puzzle solution and update example2.txt if needed.
+"""
+import sys
+import time
+from datetime import date
+from pathlib import Path
 
-set -euo pipefail
-set -x
+import typer
+from aocd.models import Puzzle
+from typing_extensions import Annotated
 
-die() {
-  printf >&2 '%s\n' "$*"
-  exit 1
-}
+BIN_DIR = Path(__file__).parent
+REPO_DIR = BIN_DIR.parent
 
-usage() {
-  die "Usage: submit {1 | 2} RESULT"
-}
 
-aoc_download() {
-  aoc download -y 2023 -d "$@"
-}
+def die(message: str) -> None:
+    print(message, file=sys.stderr)
+    raise typer.Exit(1)
 
-aoc_submit() {
-  aoc submit -y 2023 -d "$@"
-}
 
-daynum() {
-  local day
-  day=$(pwd)
-  day=${day##*/} # basename
-  case $day in
-    day[01][0-9]) : ;;
-    *) die "CWD is not a dayNN directory" ;;
-  esac
-  local daynum=${day#day}
-  echo "${daynum#0}"
-}
+def today() -> int:
+    return date.today().day
 
-main() {
-  test $# -eq 2 || usage
-  local level=$1
-  local result=$2
 
-  case $level in
-    1 | 2) : ;;
-    *) usage ;;
-  esac
+def is_unlocked(puzzle: Puzzle) -> bool:
+    return time.time() >= puzzle.unlock_time().timestamp()
 
-  local daynum
-  daynum=$(daynum)
 
-  aoc_submit "$daynum" -l "$level" "$result"
+def valid_part(part: int):
+    if part not in (1, 2):
+        raise typer.BadPameter("Only 1 or 2 is allowed.")
+    return part
 
-  if test "$level" = 2; then
-    return
-  fi
 
-  mv problem.md README.md
+def main(
+    part: Annotated[int, typer.Argument(callback=valid_part)],
+    answer: Annotated[int, typer.Argument()],
+    day: Annotated[int, typer.Option()] = today(),
+):
+    puzzle = Puzzle(year=2023, day=day)
+    if not is_unlocked(puzzle):
+        die(f"Puzzle day {day} is not yet unlocked.")
 
-  if echo 1 | aoc_download "$daynum" -e; then
-    rm -f example2.txt
-    if cmp -s example.txt example1.txt; then
-      rm -f example.txt
-      ln -s example1.txt example2.txt
-    else
-      mv example.txt example2.txt
-    fi
-  fi
-}
+    if part == 1:
+        puzzle.answer_a = answer
+    else:
+        puzzle.answer_b = answer
+        return
 
-main "$@"
+    puzzle = Puzzle(year=2023, day=day)
+    if len(puzzle.examples) != 2:
+        return
+
+    example2_txt = REPO_DIR / f"day{day:02}" / "example2.txt"
+    if example2_txt.is_symlink():
+        example2_txt.unlink()
+        example2_txt.write_text(puzzle.examples[1].input_data + "\n")
+
+
+if __name__ == "__main__":
+    typer.run(main)
