@@ -13,46 +13,32 @@ aoc_download() {
 }
 
 main() {
-  case $1 in
+  local day=$1
+  case $day in
     day[01][0-9]) : ;;
     *) die "Usage: download dayNN" ;;
   esac
-  local day=$1
-  local daynum=${day#day}
-  daynum=${daynum#0}
+
+  if test -s "$day/input.txt"; then
+    return
+  fi
 
   mkdir -p "$day"
   cd "$day"
+
+  local daynum=${day#day}
+  daynum=${daynum#0}
 
   if ! test -s "$day.py"; then
     sed -e "s|day/0|day/$daynum|" <../day00/day00.py >"$day.py"
     chmod +x "$day.py"
   fi
 
-  if ! test -s input.txt; then
-    aoc_download "$daynum"
-    mv problem.md README.md
-    touch example1.txt
-    touch example2.txt
-  fi
-
-  if ! test -s example1.txt; then
-    echo 0 | aoc_download "$daynum" -e
-    rm -f example1.txt
-    mv example.txt example1.txt
-  fi
-
-  if ! test -s example2.txt; then
-    if echo 1 | aoc_download "$daynum" -e; then
-      rm -f example2.txt
-      if cmp -s example.txt example1.txt; then
-        rm -f example.txt
-        ln -s example1.txt example2.txt
-      else
-        mv example.txt example2.txt
-      fi
-    fi
-  fi
+  aoc_download "$daynum"
+  echo 0 | aoc_download "$daynum" -e
+  mv problem.md README.md
+  mv example.txt example1.txt
+  ln -s example1.txt example2.txt
 }
 
 main "$@"

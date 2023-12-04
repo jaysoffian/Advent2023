@@ -1,0 +1,67 @@
+#!/bin/bash
+
+set -euo pipefail
+set -x
+
+die() {
+  printf >&2 '%s\n' "$*"
+  exit 1
+}
+
+usage() {
+  die "Usage: submit {1 | 2} RESULT"
+}
+
+aoc_download() {
+  aoc download -y 2023 -d "$@"
+}
+
+aoc_submit() {
+  aoc submit -y 2023 -d "$@"
+}
+
+daynum() {
+  local day
+  day=$(pwd)
+  day=${day##*/} # basename
+  case $day in
+    day[01][0-9]) : ;;
+    *) die "CWD is not a dayNN directory" ;;
+  esac
+  local daynum=${day#day}
+  echo "${daynum#0}"
+}
+
+main() {
+  test $# -eq 2 || usage
+  local level=$1
+  local result=$2
+
+  case $level in
+    1 | 2) : ;;
+    *) usage ;;
+  esac
+
+  local daynum
+  daynum=$(daynum)
+
+  aoc_submit "$daynum" -l "$level" "$result"
+
+  if test "$level" = 2; then
+    return
+  fi
+
+  mv problem.md README.md
+
+  if echo 1 | aoc_download "$daynum" -e; then
+    rm -f example2.txt
+    if cmp -s example.txt example1.txt; then
+      rm -f example.txt
+      ln -s example1.txt example2.txt
+    else
+      mv example.txt example2.txt
+    fi
+  fi
+}
+
+main "$@"
