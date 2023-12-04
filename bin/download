@@ -29,16 +29,20 @@ main() {
   local daynum=${day#day}
   daynum=${daynum#0}
 
-  if ! test -s "$day.py"; then
-    sed -e "s|day/0|day/$daynum|" <../day00/day00.py >"$day.py"
-    chmod +x "$day.py"
+  if ! aoc_download "$daynum"; then
+    cd ..
+    rmdir "$day" || :
+    exit 1
   fi
-
-  aoc_download "$daynum"
   echo 0 | aoc_download "$daynum" -e
   mv problem.md README.md
   mv example.txt example1.txt
   ln -s example1.txt example2.txt
+
+  if ! test -s "$day.py"; then
+    sed -e "s|day/0|day/$daynum|" <../day00/day00.py >"$day.py"
+    chmod +x "$day.py"
+  fi
 }
 
 main "$@"
