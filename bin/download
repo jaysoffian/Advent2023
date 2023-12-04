@@ -26,6 +26,7 @@ main() {
 
   if ! test -s "$day.py"; then
     sed -e "s|day/0|day/$daynum|" <../day00/day00.py >"$day.py"
+    chmod +x "$day.py"
   fi
 
   if ! test -s input.txt; then
