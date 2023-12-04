@@ -61,10 +61,7 @@ def part1(lines: list[str]) -> int:
 
 def part2(lines: list[str]) -> int:
     num_lines = len(lines)
-    copies: Counter[int] = Counter()
-
-    for i in range(1, num_lines + 1):
-        copies[i] += 1
+    copies: Counter[int] = Counter(range(1, num_lines + 1))
 
     for i, line in enumerate(lines, 1):
         num_wins = num_matches(line)
